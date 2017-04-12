@@ -1,50 +1,65 @@
 angular.module('starter.services', [])
 
-.factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
+.factory('User', function($http, API, $q) {
+	function getUsers() {
+		return $http({
+			method: 'GET',
+			url: API.url + 'users'
+		}).then(function(success) {
+			return success.data;
+		}, function(error) {
+			return error;
+		});
+	};
 
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
-  }];
+	function loginUser(user) {
+		var defered = $q.defer();
 
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
+		errors = validateUserCredintals(user);
+
+		if(errors.length > 0) {
+			return defered.reject('errors');
+		};
+
+		$http({
+			method: 'POST',
+			url: API.url + 'users',
+			data: user
+		}).then(function(success) {
+			console.log('We have succeded in service!');
+			return defered.resolve(success);
+		}, function(error) {
+			console.log('We got an error in service!');
+			return defered.reject('error');
+		});
+
+		return defered.promise;
+	};
+
+	function validateUserCredintals(data) {
+		var errors = [];
+		var users = [];
+
+        if((data.nickname == '') || (data.nickname === undefined)) {
+            errors.push('Nickname field should not be empty');
         }
-      }
-      return null;
-    }
-  };
+
+        getUsers().then(function(users) {
+        	users = users;
+	    	users.filter(function(value) {
+	    		console.log(value.name);
+	            if(value.name === data.nickname) {
+	                errors.push(value.name + ' is already in use.');
+	            }
+	        });
+        }, function(error) {
+        	console.log('Something went wrong!');
+        });
+        return errors;  
+	};
+
+	return {
+		getUsers: getUsers,
+		loginUser: loginUser
+	};
 });

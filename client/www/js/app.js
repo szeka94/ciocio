@@ -7,9 +7,10 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', [
   'ionic',
-  'ngCordova',
   'starter.controllers',
-  'starter.services'
+  'starter.services',
+  'starter.constants',
+  'ngCordova'
 ])
 
 .run(function($ionicPlatform) {
@@ -28,7 +29,13 @@ angular.module('starter', [
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+	// Fix for CORS
+	$httpProvider.defaults.headers.common = {};
+	$httpProvider.defaults.headers.post = {};
+	$httpProvider.defaults.headers.put = {};
+	$httpProvider.defaults.headers.patch = {};
+
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -37,10 +44,18 @@ angular.module('starter', [
   $stateProvider
 
   // setup an abstract state for the tabs directive
+    .state('login', {
+    url: '/login',
+    templateUrl: 'templates/tab-login.html',
+    controller: 'LoginCtrl'
+  })
+
     .state('tab', {
     url: '/tab',
     abstract: true,
     templateUrl: 'templates/tabs.html'
+
+
   })
 
   // Each tab has its own nav history stack:
@@ -55,35 +70,25 @@ angular.module('starter', [
     }
   })
 
-  .state('tab.chats', {
-      url: '/chats',
+  .state('tab.invite', {
+      url: '/invite',
       views: {
-        'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
-          controller: 'ChatsCtrl'
-        }
-      }
-    })
-    .state('tab.chat-detail', {
-      url: '/chats/:chatId',
-      views: {
-        'tab-chats': {
-          templateUrl: 'templates/chat-detail.html',
-          controller: 'ChatDetailCtrl'
+        'tab-invite': {
+          templateUrl: 'templates/tab-invite.html',
+          controller: 'InviteCtrl'
         }
       }
     })
 
-  .state('tab.account', {
-    url: '/account',
+  .state('tab.settings', {
+    url: '/settings',
     views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
+      'tab-settings': {
+        templateUrl: 'templates/tab-settings.html',
+        controller: 'SettingsCtrl'
       }
     }
   });
-
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/dash');
 

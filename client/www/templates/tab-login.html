@@ -1,0 +1,15 @@
+<ion-view view-title="Dashboard">
+	<ion-content class="padding" style="text-align: center">
+		<ul>
+			<li ng-repeat="error in errors">{{ error }}</li>
+		</ul>
+		<h2 style="padding-top: 20px;">Welcome to Cio-Cio App</h2>
+		<label class="item item-input" style="margin-top: 25px;">
+			<span class="input-label">Username</span>
+			<input type="text" placeholder="Add a nickname" ng-model="data.nickname" />
+		</label>
+		<div style="padding-top: 15px;">
+			<a href="" ng-click="login()"><button class="button icon-left ion-locked button-positive" style="font-size: 13px;">Login as {{ data.nickname }}</button></a>
+		</div>
+	</ion-content>
+</ion-view>

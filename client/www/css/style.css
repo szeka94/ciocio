@@ -1,1 +1,12 @@
 /* Empty. Add your own CSS if you like */
+ion-content {
+	background-color: #e1f5fe;
+}
+
+ion-nav-bar {
+	background-color: #90CAF9;
+}
+
+.bar-stable {
+	background-color: #90CAF9;
+}

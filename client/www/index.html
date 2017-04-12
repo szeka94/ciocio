@@ -29,25 +29,27 @@
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
     <script src="js/ng-cordova.min.js"></script>
+    <script src="lib/ng-cordova-oauth/dist/ng-cordova-oauth.js"></script>
 
     <!-- your app's js -->
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
+    <script src="js/constants.js"></script>
   </head>
-  <body ng-app="starter">
-    <!--
-      The nav bar that will be updated as we navigate between views.
-    -->
-    <ion-nav-bar class="bar-stable">
-      <ion-nav-back-button>
-      </ion-nav-back-button>
-    </ion-nav-bar>
-    <!--
-      The views will be rendered in the <ion-nav-view> directive below
-      Templates are in the /templates folder (but you could also
-      have templates inline in this html file if you'd like).
-    -->
-    <ion-nav-view></ion-nav-view>
+  <body ng-app="starter" style="background-color: #e1f5fe;">
+      <!--
+        The nav bar that will be updated as we navigate between views.
+      -->
+      <ion-nav-bar class="bar-stable">
+        <ion-nav-back-button>
+        </ion-nav-back-button>
+      </ion-nav-bar>
+      <!--
+        The views will be rendered in the <ion-nav-view> directive below
+        Templates are in the /templates folder (but you could also
+        have templates inline in this html file if you'd like).
+      -->
+      <ion-nav-view style="background-color: #e1f5fe !important;"></ion-nav-view>
   </body>
 </html>
