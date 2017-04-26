@@ -1,8 +1,23 @@
 <ion-view view-title="Dashboard">
   <ion-content class="padding">
-    <h2 style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #387ef5; text-align: center;">Welcome to Cio-Cio app</h2>
+    <h2 ng-hide="vm.matchCreated" style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #387ef5; text-align: center;">
+    	Welcome to Cio-Cio app
+    </h2>
+    <div ng-show="vm.matchCreated">
+	    <h2 style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #387ef5; text-align: center;">
+	    A new match has been created!
+	    </h2>
+	    <h4 style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #000000; text-align: center;">
+	    	{{ vm.playerNumber }}/4
+	    </h4>
+    </div>
     <div style="width: 100%; text-align: center; float: none; margin: 0px auto;">
-	    <button class="button button-calm button-large icon-left ion-fireball" ng-click="createMatch()" style="margin-top: 2em;">
+	    <button class="button button-calm button-large icon-left ion-fireball" ng-disabled="vm.matchCreated" ng-click="vm.createMatch()" style="margin-top: 2em;">
+	        Create match
+	    </button>
+    </div>
+     <div style="width: 100%; text-align: center; float: none; margin-top: 30px auto;">
+	    <button class="button button-calm button-large icon-left ion-fireball" ng-show='vm.canJoin' ng-click="vm.joinMatch()" style="margin-top: 2em;">
 	        Create match
 	    </button>
     </div>

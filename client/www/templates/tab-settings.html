@@ -1,9 +1,12 @@
 <ion-view view-title="Settings" style="background-color: #e1f5fe;">
 	<ion-content style="width: 90%; margin: 0 5%;">
 		<ion-list>
-			<ion-toggle ng-model="settings.enableFriends">
+			<ion-toggle ng-model="vm.settings.enableFriends">
 				DNB
 			</ion-toggle>
+		    <button class="button button-assertive button-block icon-left ion-trash-b" ng-click="vm.destroyUser()" style="margin-top: 2em;">
+		        Destroy User
+		    </button>
 		</ion-list>
 	</ion-content>
 </ion-view>
