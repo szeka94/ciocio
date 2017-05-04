@@ -128,9 +128,11 @@ def handle_new_match(data):
 		emit('new match response', resp)
 	else: 
 		match_created = True
+		game = Game(data)
 		resp = json.dumps({
 					'message': '{} created a match'.format(data),
 					'player_num': 1,
+					'players': game.actions.get_players(),
 					'creator': data,
 						})
 		emit('new match response', resp, broadcast=True)
@@ -138,6 +140,21 @@ def handle_new_match(data):
 @socketio.on('invite player')
 def handle_invitation(data):
 	emit(data['person']['name'], data['creator'], broadcast=True)
+
+@socketio.on('join game')
+def join_game(player):
+	game=Game()
+	if not game.actions.join_match(player):
+		data = 'Error'
+		emit('joined', data, broadcast=True)
+
+	print('Joined {}'.format(player))
+	data = json.dumps({'match_created': match_created,
+				'players': game.actions.get_players(),
+				'num_players': game.actions.get_num_players(),})
+	emit('joined', data, broadcast=True)
+
+
 
 if __name__ == "__main__":
 	socketio.run(app, debug=True)

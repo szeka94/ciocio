@@ -12,14 +12,17 @@
 	    </h4>
     </div>
     <div style="width: 100%; text-align: center; float: none; margin: 0px auto;">
-	    <button class="button button-calm button-large icon-left ion-fireball" ng-disabled="vm.matchCreated" ng-click="vm.createMatch()" style="margin-top: 2em;">
+	    <button class="button button-calm button-large icon-left ion-fireball" ng-hide="vm.matchCreated" ng-click="vm.createMatch()" style="margin-top: 2em;">
 	        Create match
 	    </button>
     </div>
      <div style="width: 100%; text-align: center; float: none; margin-top: 30px auto;">
 	    <button class="button button-calm button-large icon-left ion-fireball" ng-show='vm.canJoin' ng-click="vm.joinMatch()" style="margin-top: 2em;">
-	        Create match
+	        Join
 	    </button>
     </div>
+	    <ul>
+	    	<li ng-repeat="player in vm.players">{{ player }}</li>
+	    </ul>
   </ion-content>
 </ion-view>

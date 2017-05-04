@@ -95,21 +95,8 @@ angular.module('starter.services', [])
 	return mySocket;
 })
 
-.factory('Match', function($ionicPopup, $http, API, LOCAL_TOKEN_KEY) {
-	var current_user = window.localStorage.getItem(LOCAL_TOKEN_KEY.username);
-
-	function joinUser(user) {
-		return $http({
-			method: 'POST',
-			url: API.url + 'match/' + 'join',
-			data: user
-		}).then(function(success) {
-			console.log(current_user + ' joined');
-			console.log(success);
-		}, function(error) {
-			console.log('Something went wrong');
-		});
-	};
+.factory('Match', function($ionicPopup, $http, API, LOCAL_TOKEN_KEY, Socket, User) {
+	var current_user = User.getCurrentUsername();
 
 	function matchPopup(data) {
 		if(data.creator !== current_user) {
@@ -126,7 +113,7 @@ angular.module('starter.services', [])
                         // On this tapp send the
                         // user credintals to the server
                         // initialize game etc..
-                        joinUser(current_user);
+                        Socket.emit('join game', current_user);
                     }
                 }
                 ]
@@ -134,27 +121,29 @@ angular.module('starter.services', [])
         };
 	};
 
-	function createMatch(creator, invited) {
-		var data = {
-			creator: creator,
-			invited: invited
-		};
+	// Used for populate vm
+	// In the controller
+	function joined(data) {
+		var canJoin = false;
+        data = JSON.parse(data);
 
-		return $http({
-			method: 'POST',
-			url: API.url + 'match/create',
-			data: data 
-		}).then(function(success) {
-			console.log('Success');
-			console.log(success);
-		}, function(error) {
-			console.log('Error');
-			console.log(error);
-		});
+		if(data.players.indexOf(current_user) !== -1) {
+            canJoin = false;
+        } else {
+            canJoin = true;
+        };
+        
+		return {
+			matchCreated: data.matchCreated,
+	        canJoin: canJoin,
+	        playerNumber: data.num_players,
+	        players: data.players
+		};
 	};
+
 
 	return {
 		matchPopup: matchPopup,
-		createMatch: createMatch
+		joined: joined
 	}
 })

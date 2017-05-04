@@ -6,14 +6,15 @@ angular.module('starter.controllers', [])
     $scope.vm = {
         matchCreated: false,
         canJoin: false,
-        createMatch: createMatch,
-        playerNumber: 0
+        playerNumber: 0,
+        players: []
     };
         
-    function createMatch() {
+    $scope.createMatch = function() {
         // use some logics in the templates
         // disable button, etc.
-        invited = [];
+        $scope.vm.players.push(username);
+        console.log($scope.vm.players);
         // Match.createMatch(username);
         Socket.emit('new match', username);
     };
@@ -21,12 +22,17 @@ angular.module('starter.controllers', [])
     // Popup when somebody creates a match
     Socket.on('new match response', function(data) {
         data = JSON.parse(data);
-        console.log(data);
-        $scope.vm.canJoin = data.creator !== username ? true : false;
-        $scope.vm.matchCreated = true;
-        $scope.vm.playerNumber = data.player_num;
-        console.log(data.creator + ' created a match');
+        console.log(data.creator);
+        console.log(username);
+        // $scope.vm.canJoin = data.creator !== username ? true : false;
+        // $scope.vm.matchCreated = true;
+        // $scope.vm.playerNumber = data.player_num;
         Match.matchPopup(data);
+    });
+
+    // When somebody joins the game
+    Socket.on('joined', function(data) {
+        $scope.vm = Match.joined(data);
     });
 })
 
@@ -40,10 +46,10 @@ angular.module('starter.controllers', [])
 //});
     
     $scope.vm = {
-        people: null,
         matchCreated: false,
+        canJoin: false,
         playerNumber: 0,
-        invite: invite
+        players: []
     };
 
     User.getUsers().then(function(data) {
@@ -53,7 +59,7 @@ angular.module('starter.controllers', [])
     var current_user = User.getCurrentUsername();
 
     // Send invitation
-    function invite(person) {
+    $scope.invite = function(person) {
         var data = {
             'person': person,
             'creator': current_user
