@@ -1,51 +1,40 @@
 class Game:
 
-    class MatchActions:
-        players = []
-
-        def __init__(self, creator):
-            Game.MatchActions.players.append(creator)
-
-        @staticmethod
-        def get_num_players():
-            return int(len(Game.MatchActions.players))
-
-        @staticmethod
-        def get_players():
-            return Game.MatchActions.players
-
-        def join_match(self, player):
-            num = Game.MatchActions.get_num_players()
-            if num == 4:
-                return False
-            Game.MatchActions.players.append(player)
-            return True
-
-        def leave_match(self, player):
-            Game.MatchActions.players.remove(player)
-
-    class __Game:
-        def __init__(self, creator):
-            self.creator = creator
-            self.actions = Game.MatchActions(creator)
-
-        def start_game(self):
-            num = self.actions.get_num_players()
-            if num < 4:
-                return {'message': '{} more people to go!'.format((4 - num)) }
-            return {
-                'message': 'The game has been started',
-                'players': self.actions.get_players(),
-            }
-
-        def __str__(self):
-            return repr(self) + self.creator
-
-    instance = None
 
     def __init__(self, creator=None):
-        if not Game.instance:
-            Game.instance = Game.__Game(creator)
+        self.creator = creator
+        self.players = []
+        self.in_progress = False
 
-    def __getattr__(self, name):
-        return getattr(self.instance, name)
+    def create_game(self, creator):
+        self.creator = creator
+        self.in_progress = True
+        self.players.append(creator)
+
+    def join_match(self, player):
+        num = self.get_num_players()
+        if num == 4:
+            return False
+        self.players.append(player)
+        return True
+
+    def get_num_players(self):
+        return int(len(self.players))
+
+    def get_players(self):
+        return self.players
+
+    def leave_match(self, player):
+        self.players.remove(player)
+
+    def start_game(self):
+        num = self.get_num_players()
+        if num < 4:
+            return False
+        self.in_progress = True
+        return True
+
+    def game_over(self):
+        self.players = []
+        self.in_progress = False
+        self.creator = None

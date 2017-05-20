@@ -95,10 +95,34 @@ angular.module('starter.services', [])
 	return mySocket;
 })
 
-.factory('Match', function($ionicPopup, $http, API, LOCAL_TOKEN_KEY, Socket, User) {
+.factory('Match', function($ionicPopup, $http, Socket, User, API, $state, $q) {
 	var current_user = User.getCurrentUsername();
 
+	
+	// Used to format the response
+	// and populate $scope.vm
+	function formatVM(data) {
+		var obj = {
+			isCreator: data.creator === current_user,
+			matchCreated: data.match_created,
+	        canJoin: data.players.indexOf(current_user) === -1 ? true : false,
+	        playerNumber: data.num_players,
+	        players: data.players
+		};
+		return obj;
+	}
+
+	function joinCurrentUser() {
+		return $http({
+			method: 'POST',
+			url: API.url + 'match/join',
+			data: { username: current_user }
+		});
+	}
+
+
 	function matchPopup(data) {
+		var defered = $q.defer();
 		if(data.creator !== current_user) {
             var newMatchPopup = $ionicPopup.show({
                 title: 'New Match Created by ' + data.creator,
@@ -110,40 +134,61 @@ angular.module('starter.services', [])
                     text: 'Join',
                     type: 'button, button-outline, button-positive',
                     onTap: function(e) {
-                        // On this tapp send the
-                        // user credintals to the server
-                        // initialize game etc..
-                        Socket.emit('join game', current_user);
+                        // Socket.emit('join game', current_user);
+                        joinCurrentUser().then(function(success) {
+                        	console.log('Success');
+                        	defered.resolve(success);
+                        }, function(error) {
+                        	console.log('Error');
+                        	defered.resolve(error);
+                        });
                     }
-                }
-                ]
+                }]
             });
         };
-	};
+        return defered.promise;
+	}
 
-	// Used for populate vm
-	// In the controller
-	function joined(data) {
-		var canJoin = false;
-        data = JSON.parse(data);
 
-		if(data.players.indexOf(current_user) !== -1) {
-            canJoin = false;
-        } else {
-            canJoin = true;
-        };
-        
-		return {
-			matchCreated: data.matchCreated,
-	        canJoin: canJoin,
-	        playerNumber: data.num_players,
-	        players: data.players
-		};
-	};
+	// Initializing the vm
+	// populating the obj from server
+	function initState() {
+		return $http({
+			method: 'GET',
+			url: API.url + 'match/initialize',
+		}).then(function(success) {
+			return formatVM(success.data);
+		});
+	}
+
+	function deleteMatch(username) {
+		return $http({
+			method: 'POST',
+			url: API.url + 'match/delete',
+			data: { username: username }
+		});
+	}
+
+	function createNewMatch(username) {
+		return $http({
+			method: 'POST',
+			url: API.url + 'match/new',
+			data: { username: username }
+		}).then(function(success) {
+			console.log(success);
+			return success.data;
+		}, function(error) {
+			console.log(error);
+			return error;
+		});
+	}
 
 
 	return {
 		matchPopup: matchPopup,
-		joined: joined
+		formatVM: formatVM,
+		deleteMatch: deleteMatch,
+		initState: initState,
+		createNewMatch: createNewMatch
 	}
 })

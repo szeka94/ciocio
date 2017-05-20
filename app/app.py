@@ -20,6 +20,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
+game = Game()
+
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
 # You should solve this with Access-Control-Allow-Origin header
@@ -105,54 +107,107 @@ def delete_user(username):
 	db.session.commit()
 	return jsonify({'message': 'User deleted successfully'})
 
-# Maybe I dont need this
-# @app.route('/api/match/create', methods=['POST'])
-# def create_match():
-# 	data = json.loads(request.get_data(as_text=True))
-# 	if 'invited' in data and len(a) == 4:
-# 		players = [creator]
-# 		players.append(player) for player in invited
-# 		game = Game(players)
+@app.route('/api/match/initialize', methods=['GET'])
+def initalize_data():
+	return jsonify({
+			'match_created' : game.in_progress,
+			'num_players' : game.get_num_players(),
+			'players' : game.get_players(),
+			'creator' : game.creator
+		})
 
-# 	return jsonify({'message': 'Success'})
 
+@app.route('/api/match/new', methods=['POST'])
+def create_new_match():
+	data = json.loads(request.get_data(as_text=True))
+	username = data['username']
+	if game.in_progress:
+		return jsonify({ 'message' : 'There is a game in progress' }), 404
+	game.create_game(username)
+	game.in_progress = True
+	resp = json.dumps({
+				'match_created' : game.in_progress,
+				'num_players' : game.get_num_players(),
+				'players' : game.get_players(),
+				'creator' : game.creator
+			})
+	socketio.emit('new match response', resp, broadcast=True)
+	return jsonify(resp)
+
+
+
+@app.route('/api/match/delete', methods=['POST'])
+def delete_match():
+	data = json.loads(request.get_data(as_text=True))
+	username = data['username']
+	if not game.in_progress:
+		return jsonify({'error' : 'Game not found'}), 404
+	if not game.creator == username:
+		return jsonify({'error' : '{} cannot delete this game!'
+						.format(username)}), 400
+	game.game_over()
+	players = json.dumps({'players' : game.get_players()})
+	# should brodcast a message to refresh the page
+	socketio.emit('refresh', brodcast=True)
+	print(game.in_progress)
+	return jsonify({
+			'match_created' : game.in_progress,
+			'num_players' : game.get_num_players(),
+			'players' : game.get_players(),
+			'creator' : game.creator
+		})
+
+@app.route('/api/match/join', methods=['POST'])
+def join_match():
+	data = json.loads(request.get_data(as_text=True))
+	username = data['username']
+	if game.in_progress:
+		game.join_match(username)
+		socketio.emit('refresh', brodcast=True)
+		return jsonify({
+			'match_created' : game.in_progress,
+			'num_players' : game.get_num_players(),
+			'players' : game.get_players(),
+			'creator' : game.creator
+		})
+	return jsonify({'error' : 'Match not found'}), 404
 
 # SocketIO - msg sender
-match_created = False
 
-@socketio.on('new match')
-def handle_new_match(data):
-	global match_created
-	if match_created:		
-		resp = json.dumps({'message': 'You cannot create match!'})
-		emit('new match response', resp)
-	else: 
-		match_created = True
-		game = Game(data)
-		resp = json.dumps({
-					'message': '{} created a match'.format(data),
-					'player_num': 1,
-					'players': game.actions.get_players(),
-					'creator': data,
-						})
-		emit('new match response', resp, broadcast=True)
+# @socketio.on('new match')
+# def handle_new_match(data):
+# 	if 'match_created' in session:
+# 		if session['match_created']:		
+# 			resp = json.dumps({'message': 'You cannot create match!'})
+# 			emit('new match response', resp)
+# 	session['match_created'] = True
+# 	game.create_game(data)
+# 	resp = json.dumps({
+# 			'match_created' : game.in_progress,
+# 			'num_players' : game.get_num_players(),
+# 			'players' : game.get_players(),
+# 			'creator' : game.creator
+# 		})
+
+# 	print(resp)
+# 	emit('new match response', resp, broadcast=True)
 
 @socketio.on('invite player')
 def handle_invitation(data):
+	print('{} invites {}'.format(data['creator'], data['person']['name']))
 	emit(data['person']['name'], data['creator'], broadcast=True)
 
 @socketio.on('join game')
 def join_game(player):
-	game=Game()
-	if not game.actions.join_match(player):
+	if not game.join_match(player):
 		data = 'Error'
 		emit('joined', data, broadcast=True)
-
 	print('Joined {}'.format(player))
-	data = json.dumps({'match_created': match_created,
-				'players': game.actions.get_players(),
-				'num_players': game.actions.get_num_players(),})
-	emit('joined', data, broadcast=True)
+	data = json.dumps({'match_created': game.in_progress,
+				'players': game.get_players(),
+				'num_players': game.get_num_players(),})
+	print(data)
+	emit('joined', broadcast=True)
 
 
 

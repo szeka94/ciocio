@@ -1,28 +1,37 @@
 <ion-view view-title="Dashboard">
   <ion-content class="padding">
-    <h2 ng-hide="vm.matchCreated" style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #387ef5; text-align: center;">
-    	Welcome to Cio-Cio app
-    </h2>
-    <div ng-show="vm.matchCreated">
+  	<div ng-hide="vm.matchCreated" style="width: 100%;">
+	    <h2 style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #387ef5; text-align: center;">
+	    	Welcome to Cio-Cio app.
+	    </h2>
+	    <div style="width: 100%; text-align: center; float: none; margin: 0px auto;">
+		    <button class="button button-calm button-large icon-left ion-fireball" ng-click="createMatch()" style="margin-top: 2em;">
+		        Create match
+		    </button>
+	    </div>
+  	</div>
+  	<div ng-show="vm.matchCreated" style="width: 100%;">
 	    <h2 style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #387ef5; text-align: center;">
 	    A new match has been created!
 	    </h2>
 	    <h4 style="padding-top: 1.5em; font-family: Arial, sans-serif; color: #000000; text-align: center;">
 	    	{{ vm.playerNumber }}/4
 	    </h4>
-    </div>
-    <div style="width: 100%; text-align: center; float: none; margin: 0px auto;">
-	    <button class="button button-calm button-large icon-left ion-fireball" ng-hide="vm.matchCreated" ng-click="vm.createMatch()" style="margin-top: 2em;">
-	        Create match
-	    </button>
-    </div>
-     <div style="width: 100%; text-align: center; float: none; margin-top: 30px auto;">
-	    <button class="button button-calm button-large icon-left ion-fireball" ng-show='vm.canJoin' ng-click="vm.joinMatch()" style="margin-top: 2em;">
-	        Join
-	    </button>
-    </div>
-	    <ul>
-	    	<li ng-repeat="player in vm.players">{{ player }}</li>
-	    </ul>
+	     <div style="width: 100%; text-align: center; float: none; margin-top: 30px;">
+		    <button class="button button-calm button-large icon-left ion-fireball" ng-show='vm.canJoin' ng-click="vm.joinMatch()" style="margin-top: 2em;">
+		        Join
+		    </button>
+	    </div>
+	    <div style="width: 100%; text-align: center; float: none; margin-top: 15px;">
+		    <ul>
+		    	<li style="font-family: Arial, Helvetica, sans-serif; font-size: 25px; font-style: italic; font-weight: 500; line-height: 35px; color: #382020;" ng-repeat="player in vm.players">{{ player }}</li>
+		    </ul>
+	    </div>
+	    <div style="width: 100%; text-align: center; float: none; margin: 0px auto;">
+		    <button class="button button-calm button-large icon-left ion-fireball" ng-show="vm.isCreator" ng-click="deleteMatch()" style="margin-top: 2em;">
+		        Match Done
+		    </button>
+	    </div>
+  	</div>
   </ion-content>
 </ion-view>
