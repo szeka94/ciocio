@@ -42,18 +42,12 @@ angular.module('starter.controllers', [])
             $scope.vm = data;
         });
     });
-
     // When somebody joins the game
     Socket.on('joined', function() {
         Match.initState().then(function(data) {
             $scope.vm = data;
         });
     });
-
-
-
-
-
 })
 
 .controller('InviteCtrl', function($scope, Match, User, Socket, LOCAL_TOKEN_KEY) {
@@ -64,8 +58,13 @@ angular.module('starter.controllers', [])
 //
     $scope.$on('$ionicView.enter', function(e) {
         User.getUsers().then(function(data) {
-            $scope.people = data;
-        })
+            $scope.people = data.filter(function(person) {
+                return person.name !== current_user;
+            });
+        });
+        if($scope.inv.players.length > 0) {
+            $scope.inv.invitation = true;
+        }
     });
     
     $scope.vm = {
@@ -74,19 +73,51 @@ angular.module('starter.controllers', [])
         playerNumber: 0,
         players: []
     };
+    $scope.inv = {
+        players: [],
+        invitation: false
+    };
 
     
     var current_user = User.getCurrentUsername();
 
-    // Send invitation
+    // Invite player
     $scope.invite = function(person) {
-        var data = {
-            'person': person,
-            'creator': current_user
-        };
-        Socket.emit('invite player', data);
+        // Socket.emit('invite player', data);
+        var tmp = $scope.inv.players.filter(function(player) {
+            return player.name === current_user;
+        });
+        if(tmp.length === 0) {
+            $scope.inv.players.push({name: current_user});
+        }
+        $scope.inv.invitation = true;
+        person.invited = true;
+        $scope.inv.players.push(person);
     };
+
+    // Remove from invitation list
+    $scope.remove = function(person) {
+        person.invited = false;
+        $scope.inv.players = $scope.inv.players.filter(function(p) {
+            return p.name !== person.name;
+        });
+        if($scope.inv.players.length == 0) {
+            $scope.inv.invitation = false;
+        }
+    }
     
+    // Sending the invitations
+    $scope.sendInvitations = function() {
+        data = {
+            players: $scope.inv.players
+        };
+
+        console.log(data);
+    }
+
+
+
+
     // Recive invitation
     Socket.on(current_user, function(data) {
         console.log('You got an invitation from ' + data);

@@ -1,10 +1,24 @@
 <ion-view view-title="Invite" style="background-color: #e1f5fe;">
     <ion-content style="width: 90%; margin: 0 5%;">
+        <div ng-show="inv.invitation" style="margin-top: 15px; margin-bottom: 15px; background-color: #ffffff; text-align: center;">
+            <h4 style="color: #387ef5; padding: 15px 0px;">You invited these people:</h4>
+            <ul class="list">
+                <li class="item item-icon-left item-icon-right" ng-repeat="player in inv.players">
+                    <i class="icon ion-person-stalker"></i>
+                        {{ player.name }}
+                    <a href="" ng-click="remove(player)"><i class="icon ion-close-circled" style="color: red; right: 11px;"></i></a>
+                </li>
+            </ul>
+            <button ng-click="sendInvitations()" class="button button-positive icon-left" style="margin-bottom: 10px;">
+                Send invitation
+                <i class="icon ion-ios-paperplane"></i>
+            </button>
+        </div>
         <ion-list>
-            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="person in people" type="item-text-wrap">
+            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="person in people" type="item-text-wrap" style="padding-right: 10px;">
                 <img ng-src="{{person.face}}" style="max-width: 80px; max-height: 80px; display: block;" />
-                <span class="item-note" style="padding-left: 130px; font-family: Arial, Helvetica, sans-serif; color:#387ef5; font-size: 20px; line-height: 22px; float: left;">{{ person.name }}</span>
-                <button class="button icon-left ion-star button-positive" ng-click="invite(person)" style="float: right;">
+                <span class="item-note" style="padding-left: 60px; font-family: Arial, Helvetica, sans-serif; color:#387ef5; font-size: 20px; line-height: 22px; float: left;">{{ person.name }}</span>
+                <button class="button icon-left ion-star button-positive" ng-disabled='person.invited' ng-click="invite(person)" style="float: right;">
                     <ion-icon name="star"></ion-icon>
                     Invite
                 </button>

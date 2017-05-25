@@ -174,40 +174,11 @@ def join_match():
 
 # SocketIO - msg sender
 
-# @socketio.on('new match')
-# def handle_new_match(data):
-# 	if 'match_created' in session:
-# 		if session['match_created']:		
-# 			resp = json.dumps({'message': 'You cannot create match!'})
-# 			emit('new match response', resp)
-# 	session['match_created'] = True
-# 	game.create_game(data)
-# 	resp = json.dumps({
-# 			'match_created' : game.in_progress,
-# 			'num_players' : game.get_num_players(),
-# 			'players' : game.get_players(),
-# 			'creator' : game.creator
-# 		})
-
-# 	print(resp)
-# 	emit('new match response', resp, broadcast=True)
 
 @socketio.on('invite player')
 def handle_invitation(data):
 	print('{} invites {}'.format(data['creator'], data['person']['name']))
 	emit(data['person']['name'], data['creator'], broadcast=True)
-
-@socketio.on('join game')
-def join_game(player):
-	if not game.join_match(player):
-		data = 'Error'
-		emit('joined', data, broadcast=True)
-	print('Joined {}'.format(player))
-	data = json.dumps({'match_created': game.in_progress,
-				'players': game.get_players(),
-				'num_players': game.get_num_players(),})
-	print(data)
-	emit('joined', broadcast=True)
 
 
 
