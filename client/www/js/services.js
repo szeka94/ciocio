@@ -120,12 +120,21 @@ angular.module('starter.services', [])
 		});
 	}
 
+	function acceptInvitation() {
+		return $http({
+			method: 'POST',
+			url: API.url + 'invitation/accept',
+			data: { username: current_user }
+		});
+	}
+
 
 	function matchPopup(data) {
 		var defered = $q.defer();
+		var title = (data.type === 'invitation' ? 'You Are Invited by ' : 'New Match Created by ');
 		if(data.creator !== current_user) {
             var newMatchPopup = $ionicPopup.show({
-                title: 'New Match Created by ' + data.creator,
+                title: title + data.creator,
                 subTitle: 'Would you like to join?',
                 buttons: [{
                     text: 'Cancel',
@@ -135,13 +144,25 @@ angular.module('starter.services', [])
                     type: 'button, button-outline, button-positive',
                     onTap: function(e) {
                         // Socket.emit('join game', current_user);
-                        joinCurrentUser().then(function(success) {
-                        	console.log('Success');
-                        	defered.resolve(success);
-                        }, function(error) {
-                        	console.log('Error');
-                        	defered.resolve(error);
-                        });
+                        if(data.type === 'invitation') {
+                        	acceptInvitation()
+                        		.then(function(success) {
+                        			console.log('Success');
+                        			defered.resolve(success);
+                        		})
+                        		.catch(function(error) {
+                        			console.log('Error');
+                        			defered.reject(error);
+                        		});
+                        } else {
+	                        joinCurrentUser().then(function(success) {
+	                        	console.log('Success');
+	                        	defered.resolve(success);
+	                        }, function(error) {
+	                        	console.log('Error');
+	                        	defered.reject(error);
+	                        });
+                        }
                     }
                 }]
             });
@@ -169,11 +190,11 @@ angular.module('starter.services', [])
 		});
 	}
 
-	function createNewMatch(username) {
+	function createNewMatch(data) {
 		return $http({
 			method: 'POST',
 			url: API.url + 'match/new',
-			data: { username: username }
+			data: data
 		}).then(function(success) {
 			console.log(success);
 			return success.data;
@@ -183,12 +204,21 @@ angular.module('starter.services', [])
 		});
 	}
 
+	function invitePerson(data) {
+		return $http({
+			method: 'POST',
+			url: API.url + 'match/invite',
+			data: data
+		});
+	}
+
 
 	return {
 		matchPopup: matchPopup,
 		formatVM: formatVM,
 		deleteMatch: deleteMatch,
 		initState: initState,
-		createNewMatch: createNewMatch
+		createNewMatch: createNewMatch,
+		invitePerson: invitePerson
 	}
 })

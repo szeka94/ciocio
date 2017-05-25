@@ -13,7 +13,7 @@ angular.module('starter.controllers', [])
 
     // Match creation
     $scope.createMatch = function() {
-        Match.createNewMatch(username).then(function(data) {
+        Match.createNewMatch({ username: username }).then(function(data) {
             $scope.vm = data;
         })
         // Socket.emit('new match', username);
@@ -58,9 +58,16 @@ angular.module('starter.controllers', [])
 //
     $scope.$on('$ionicView.enter', function(e) {
         User.getUsers().then(function(data) {
-            $scope.people = data.filter(function(person) {
-                return person.name !== current_user;
-            });
+            $scope.people = data
+                .filter(function(person) {
+                    return person.name !== current_user;
+                })
+                .map(function(person) {
+                    person.invited = false;
+                    person.pending = false;
+                    person.approved = false;
+                    return person;
+                });
         });
         if($scope.inv.players.length > 0) {
             $scope.inv.invitation = true;
@@ -75,7 +82,7 @@ angular.module('starter.controllers', [])
     };
     $scope.inv = {
         players: [],
-        invitation: false
+        invitation: false,
     };
 
     
@@ -93,6 +100,7 @@ angular.module('starter.controllers', [])
         $scope.inv.invitation = true;
         person.invited = true;
         $scope.inv.players.push(person);
+        Match.invitePerson({ person: person, creator: current_user });
     };
 
     // Remove from invitation list
@@ -105,22 +113,35 @@ angular.module('starter.controllers', [])
             $scope.inv.invitation = false;
         }
     }
-    
-    // Sending the invitations
-    $scope.sendInvitations = function() {
-        data = {
-            players: $scope.inv.players
-        };
-
-        console.log(data);
-    }
+  
 
 
 
+
+    // // Sending the invitations
+    // $scope.sendInvitations = function() {
+    //     data = {
+    //         username: current_user,
+    //         players: $scope.inv.players,
+    //         type: 'invitation'
+    //     };
+
+    //     Match.sendInvitations(data.players)
+    //         .then(function() {
+    //             // Change the x to a pending sign
+    //         });
+    //     // Match.createNewMatch(data)
+    //     //     .then(function(data) {
+    //     //         console.log(data);
+    //     //     });
+    // }
 
     // Recive invitation
     Socket.on(current_user, function(data) {
-        console.log('You got an invitation from ' + data);
+        Match.matchPopup({
+            type: 'invitation',
+            creator: data
+        });
     });
 
     // Popup when somebody creates a match

@@ -15,7 +15,7 @@
             </button>
         </div>
         <ion-list>
-            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="person in people" type="item-text-wrap" style="padding-right: 10px;">
+            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="person in people track by $index" type="item-text-wrap" style="padding-right: 10px;">
                 <img ng-src="{{person.face}}" style="max-width: 80px; max-height: 80px; display: block;" />
                 <span class="item-note" style="padding-left: 60px; font-family: Arial, Helvetica, sans-serif; color:#387ef5; font-size: 20px; line-height: 22px; float: left;">{{ person.name }}</span>
                 <button class="button icon-left ion-star button-positive" ng-disabled='person.invited' ng-click="invite(person)" style="float: right;">

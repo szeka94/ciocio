@@ -125,7 +125,12 @@ def create_new_match():
 		return jsonify({ 'message' : 'There is a game in progress' }), 404
 	game.create_game(username)
 	game.in_progress = True
+	game_type = data.get('type', None)
+	if game_type is not None:
+		for player in data['players']:
+			game.join_match(player)
 	resp = json.dumps({
+				'type' : game_type,
 				'match_created' : game.in_progress,
 				'num_players' : game.get_num_players(),
 				'players' : game.get_players(),
@@ -157,6 +162,7 @@ def delete_match():
 			'creator' : game.creator
 		})
 
+
 @app.route('/api/match/join', methods=['POST'])
 def join_match():
 	data = json.loads(request.get_data(as_text=True))
@@ -172,14 +178,16 @@ def join_match():
 		})
 	return jsonify({'error' : 'Match not found'}), 404
 
+
+@app.route('/api/match/invite', methods=['POST'])
+def invite_somebody():
+	data = json.loads(request.get_data(as_text=True))
+	print(data)
+	socketio.emit(data['person']['name'], data['creator'], broadcast=True)
+	return jsonify({ 'message' : 'Looks good!' })
+
+
 # SocketIO - msg sender
-
-
-@socketio.on('invite player')
-def handle_invitation(data):
-	print('{} invites {}'.format(data['creator'], data['person']['name']))
-	emit(data['person']['name'], data['creator'], broadcast=True)
-
 
 
 if __name__ == "__main__":
