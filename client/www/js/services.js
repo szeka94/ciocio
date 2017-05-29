@@ -219,6 +219,7 @@ angular.module('starter.services', [])
 		deleteMatch: deleteMatch,
 		initState: initState,
 		createNewMatch: createNewMatch,
-		invitePerson: invitePerson
+		invitePerson: invitePerson,
+		joinCurrentUser: joinCurrentUser
 	}
 })

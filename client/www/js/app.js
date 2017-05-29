@@ -7,6 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', [
     'ionic',
+    'ionic.cloud',
     'btford.socket-io',
     'starter.controllers',
     'starter.services',
@@ -45,12 +46,32 @@ angular.module('starter', [
     });
 })
 
-.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider, $ionicCloudProvider) {
 // Fix for CORS
 $httpProvider.defaults.headers.common = {};
 $httpProvider.defaults.headers.post = {};
 $httpProvider.defaults.headers.put = {};
 $httpProvider.defaults.headers.patch = {};
+
+
+    $ionicCloudProvider.init({
+        "core": {
+            "app_id": "bcdd5960"
+        },
+        "push": {
+            "sender_id": "GCM_PROJECT_NUMBER",
+            "pluginConfig": {
+                "ios": {
+                    "badge": true,
+                    "sound": true
+                },
+                "android": {
+                    "iconColor": "#343434"
+                }
+            }
+        }
+    });
+
 
 
 // Ionic uses AngularUI Router which uses the concept of states
