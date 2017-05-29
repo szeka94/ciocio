@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, User, Match, Socket, $state) {
+.controller('DashCtrl', function($ionicDeploy, $scope, User, Match, Socket, $state) {
     var username = User.getCurrentUsername();
     
     $scope.$on('$ionicView.enter', function(e) {
@@ -29,6 +29,16 @@ angular.module('starter.controllers', [])
         });
     });
 
+    $scope.joinMatch = function() {
+        Match.joinCurrentUser()
+            .then(function(success) {
+                console.log(success);
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    };
+
 
     // Delete Match
     $scope.deleteMatch = function() {
@@ -48,9 +58,15 @@ angular.module('starter.controllers', [])
             $scope.vm = data;
         });
     });
+
+    // Listening to push notification
+    $scope.$on('cloud:push:notification', function(event, data) {
+        var msg = data.msg;
+        alert(msg.title + ': ' + msg.text);
+    });
 })
 
-.controller('InviteCtrl', function($scope, Match, User, Socket, LOCAL_TOKEN_KEY) {
+.controller('InviteCtrl', function($ionicDeploy, $scope, Match, User, Socket, LOCAL_TOKEN_KEY) {
 // With the new view caching in Ionic, Controllers are only called
 // when they are recreated or on app start, instead of every page change.
 // To listen for when this page is active (for example, to refresh data),
@@ -166,7 +182,7 @@ angular.module('starter.controllers', [])
     });
 })
 
-.controller('SettingsCtrl', function($state, Socket, Match, $scope, User) {
+.controller('SettingsCtrl', function($ionicDeploy, $state, Socket, Match, $scope, User) {
     $scope.vm = {
         settings: {
             enableFriends: true
@@ -179,6 +195,7 @@ angular.module('starter.controllers', [])
     // Delete user locally and from DB
     function destroyUser() {
         User.destroyUserCredintals().then(function(success) {
+            $ionicPush.unregister();
             $state.go('login', {}, {reload: true});
         });
     }
@@ -194,7 +211,7 @@ angular.module('starter.controllers', [])
     });
 })
 
-.controller('LoginCtrl', function($scope, $rootScope, API, User, $state) {
+.controller('LoginCtrl', function($ionicDeploy, $scope, $rootScope, API, User, $state, $ionicPush) {
     $scope.data = {
         nickname: ''
     };
@@ -203,6 +220,11 @@ angular.module('starter.controllers', [])
     // Handle login
     $scope.login = function() {
         User.loginUser($scope.data).then(function(success) {
+            $ionicPush.register().then(function(t) {
+                return $ionicPush.saveToken(t);
+            }).then(function(t) {
+                console.log('Token saved:', t.token);
+            })
             $state.go('tab.dash');
         }, function(error) {
             console.log('Error');
