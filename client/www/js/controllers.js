@@ -13,10 +13,10 @@ angular.module('starter.controllers', [])
 
     // Match creation
     $scope.createMatch = function() {
-        Match.createNewMatch({ username: username }).then(function(data) {
-            $scope.vm = data;
-        })
-        // Socket.emit('new match', username);
+        Match.createNewMatch({ username: username })
+            .then(function(data) {
+                $scope.vm = Match.formatVM(data);
+            });
     };
     // Brodacasted 'new match' msg from the server
     Socket.on('new match response', function(data) {

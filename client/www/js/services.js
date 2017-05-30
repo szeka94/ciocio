@@ -195,8 +195,7 @@ angular.module('starter.services', [])
 			url: API.url + 'match/new',
 			data: data
 		}).then(function(success) {
-			console.log(success);
-			return success.data;
+			return JSON.parse(success.data);
 		}, function(error) {
 			console.log(error);
 			return error;
