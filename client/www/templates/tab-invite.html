@@ -5,7 +5,7 @@
             <ul class="list">
                 <li class="item item-icon-left item-icon-right" ng-repeat="player in inv.players">
                     <i class="icon ion-person-stalker"></i>
-                        {{ player.name }}
+                        {{ player.name }} <span ng-show="player.approved" style="color: green;">- approved</span>
                     <a href="" ng-click="remove(player)"><i class="icon ion-close-circled" style="color: red; right: 11px;"></i></a>
                 </li>
             </ul>

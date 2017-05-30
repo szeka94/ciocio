@@ -60,7 +60,6 @@ class User(db.Model):
 		return '<User: {}>'.format(self.name)
 
 
-
 ############# Helpers #############
 def serialize_user(users):
 	data = []
@@ -95,6 +94,7 @@ def add_new_user():
 						'username': user.name,
 						'result': status })
 
+
 @app.route('/api/users/<username>/delete', methods=['POST'])
 def delete_user(username):
 	token = request.data.decode('utf-8')
@@ -106,6 +106,7 @@ def delete_user(username):
 	db.session.delete(user)
 	db.session.commit()
 	return jsonify({'message': 'User deleted successfully'})
+
 
 @app.route('/api/match/initialize', methods=['GET'])
 def initalize_data():
@@ -138,7 +139,6 @@ def create_new_match():
 			})
 	socketio.emit('new match response', resp, broadcast=True)
 	return jsonify(resp)
-
 
 
 @app.route('/api/match/delete', methods=['POST'])
@@ -186,6 +186,23 @@ def invite_somebody():
 	socketio.emit(data['person']['name'], data['creator'], broadcast=True)
 	return jsonify({ 'message' : 'Looks good!' })
 
+@app.route('/api/invitation/accept', methods=['POST'])
+def accept_invitation():
+	data = json.loads(request.get_data(as_text=True))
+	print(data)
+	resp = {
+		'username' : data['username'],
+		'approved' : True,
+		'invited' : True,
+		'creator' : data['creator']	
+	}
+	'''
+		successfully joined
+		Should emit a message, to send
+		notification in the invitation panel
+	'''
+	socketio.emit('accepted', json.dumps(resp))
+	return jsonify(resp)
 
 # SocketIO - msg sender
 

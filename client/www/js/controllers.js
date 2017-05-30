@@ -62,12 +62,12 @@ angular.module('starter.controllers', [])
                 .filter(function(person) {
                     return person.name !== current_user;
                 })
-                .map(function(person) {
-                    person.invited = false;
-                    person.pending = false;
-                    person.approved = false;
-                    return person;
-                });
+                // .map(function(person) {
+                //     person.invited = false;
+                //     person.pending = false;
+                //     person.approved = false;
+                //     return person;
+                // });
         });
         if($scope.inv.players.length > 0) {
             $scope.inv.invitation = true;
@@ -102,12 +102,25 @@ angular.module('starter.controllers', [])
         $scope.inv.players.push(person);
         Match.invitePerson({ person: person, creator: current_user });
     };
+    // Listen to accept/join
+    Socket.on('accepted', function(data) {
+        data = JSON.parse(data);
+        if(data.creator === current_user) {
+            $scope.inv.players = $scope.inv.players
+                .map(function(player) {
+                    if(player.name === data.username) {
+                        player.approved = data.approved;
+                    }
+                    return player;
+                });
+        }
+    });
 
     // Remove from invitation list
     $scope.remove = function(person) {
         person.invited = false;
         $scope.inv.players = $scope.inv.players.filter(function(p) {
-            return p.name !== person.name;
+            return p.name !== person.name;  
         });
         if($scope.inv.players.length == 0) {
             $scope.inv.invitation = false;

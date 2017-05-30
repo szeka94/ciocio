@@ -120,11 +120,11 @@ angular.module('starter.services', [])
 		});
 	}
 
-	function acceptInvitation() {
+	function acceptInvitation(data) {
 		return $http({
 			method: 'POST',
 			url: API.url + 'invitation/accept',
-			data: { username: current_user }
+			data: { username: current_user, creator: data.creator }
 		});
 	}
 
@@ -145,10 +145,9 @@ angular.module('starter.services', [])
                     onTap: function(e) {
                         // Socket.emit('join game', current_user);
                         if(data.type === 'invitation') {
-                        	acceptInvitation()
+                        	acceptInvitation(data)
                         		.then(function(success) {
-                        			console.log('Success');
-                        			defered.resolve(success);
+                        			defered.resolve(success.data);
                         		})
                         		.catch(function(error) {
                         			console.log('Error');
